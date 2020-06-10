@@ -1,13 +1,4 @@
-{"type":"selection-change","data":{"index":550,"length":7}}
-{"type":"selection-change","data":null}
-{"type":"text-change","data":[{"retain":553},{"retain":1,"attributes":{"table-cell-line":{"rowspan":"1","colspan":"1","row":"1","cell":"2","cell-bg":"blue"},"cell-bg":"blue"}}]}
-{"type":"selection-change","data":{"index":555,"length":0}}
-{"type":"selection-change","data":{"index":554,"length":2}}
-{"type":"selection-change","data":null}
-{"type":"text-change","data":[{"retain":557},{"retain":1,"attributes":{"table-cell-line":{"rowspan":"1","colspan":"1","row":"1","cell":"3","cell-bg":"blue"},"cell-bg":"blue"}}]}
-{"type":"selection-change","data":{"index":555,"length":0}}
-{"type":"selection-change","data":{"index":1726,"length":0}}
-{"type":"selection-change","data":{"index":1769,"length":0}}
-{"type":"selection-change","data":{"index":1780,"length":10}}
-{"type":"selection-change","data":null}
-{"type":"selection-change","data":{"index":1770,"length":0}}
+{"type":"selection-change","data":{"index":741,"length":101}}
+{"type":"text-change","data":[{"retain":741},{"insert":"不論在使用者數的上限或是在價格的部份都比百度來的優惠。所以如果您的企業使用了 50GB 以上的雲端空間並考慮導入百度雲的付費方案的話，我們強烈建議您試試看雲檔案。","attributes":{"bold":true,"background":"transparent","color":"#000000","size":"11pt"}},{"delete":101}]}
+{"type":"selection-change","data":{"index":755,"length":0}}
+{"type":"selection-change","data":{"index":809,"length":0}}

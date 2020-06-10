@@ -17,6 +17,36 @@
 		.ql-divider {
 			color: #c2c2c2;
 		}
+		span.ql-picker-options > span[data-label="Sans Serif"] {
+			font-family: 'Sans Serif';
+		}
+		span.ql-picker-options > span[data-label="Inconsolata"] {
+			font-family: 'Inconsolata';
+		}
+		span.ql-picker-options > span[data-label="Roboto"] {
+			font-family: 'Roboto';
+		}
+		span.ql-picker-options > span[data-label="Serif"] {
+			font-family: 'Serif';
+		}
+		span.ql-picker-options > span[data-label="Arial"] {
+			font-family: 'Arial';
+		}
+		span.ql-picker-options > span[data-label="Georgia"] {
+			font-family: 'Georgia';
+		}
+		span.ql-picker-options > span[data-label="Impact"] {
+			font-family: 'Impact';
+		}
+		span.ql-picker-options > span[data-label="Monospace"] {
+			font-family: 'Monospace';
+		}
+		span.ql-picker-options > span[data-label="Courier"] {
+			font-family: 'Courier';
+		}
+		span.ql-picker-options > span[data-label="Verdana"] {
+			font-family: 'Verdana';
+		}
 	</style>
 	<link href="resources/quill.snow.css" rel="stylesheet">
 	<link href="resources/quill-better-table.css" rel="stylesheet">
@@ -35,10 +65,14 @@
 		Quill.register({'modules/better-table': quillBetterTable}, true);
 		Quill.register('modules/blotFormatter', QuillBlotFormatter.default);
 		var Font = Quill.import('attributors/style/font');
-		Font.whitelist = ['inconsolata', 'roboto', 'mirza', 'arial', 'georgia', 'wt011'];
+		var Font = Quill.import('attributors/style/font');
+		Font.whitelist = ['inconsolata', 'roboto', 'serif', 'arial', 'georgia', 'impact', 'monospace', 'courier', 'verdana', 'wt011'];
 		Quill.register(Font, true);
 		var Size = Quill.import('attributors/style/size');
-		Size.whitelist = ['8pt', '10pt', '11pt', '12pt', '13pt', '14pt', '15pt', '16pt', '18pt', '20pt', '24pt', '30pt', '36pt', '48pt', '60pt', '72pt', '96pt'];
+		Size.whitelist = [];
+		for (i = 8; i < 97; i++) {
+			Size.whitelist.push(i + 'pt');
+		}
 		Quill.register(Size, true);
 
 		function send(data) {
@@ -276,11 +310,15 @@
 				<select class="ql-header"></select>
 	      <select class="ql-font">
 	        <option selected>Sans Serif</option>
-	        <option value="inconsolata">Inconsolata</option>
-	        <option value="roboto">Roboto</option>
-	        <option value="mirza">Mirza</option>
-	        <option value="arial">Arial</option>
+					<option value="serif">Serif</option>
+					<option value="arial">Arial</option>
+					<option value="courier">Courier</option>
 					<option value="georgia">Georgia</option>
+					<option value="impact">Impact</option>
+	        <option value="inconsolata">Inconsolata</option>
+					<option value="monospace">Monospace</option>
+	        <option value="roboto">Roboto</option>
+					<option value="verdana">Verdana</option>
 					<option value="wt011">wt011</option>
 	      </select>
 				<select class="ql-size">
