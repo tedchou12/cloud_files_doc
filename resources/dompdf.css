@@ -1,0 +1,32 @@
+@page {
+  margin: 62px 80px 62px 80px;
+}
+@page {
+  /* font-family: 'wt011', 'Helvetica', 'Arial', 'sans-serif'; */
+  /* word-break: break-all; */
+  /* word-wrap: break-word; */
+}
+.cjk {
+  font-family: 'wt011';
+  word-wrap: break-word;
+}
+
+.ql-align-center {
+  text-align: center;
+}
+
+.ql-align-right {
+  text-align: right;
+}
+
+.ql-align-justify {
+  text-align: justify;
+}
+
+li[data-list="ordered"] {
+  list-style-type: decimal;
+}
+
+li[data-list="bullet"] {
+  list-style-type: circle;
+}

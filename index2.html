@@ -1,0 +1,330 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset='UTF-8' />
+	<title>PHPWebSocket and TinyMCE</title>
+	<style>
+		body {
+			margin:20px; font-family:Verdana, Geneva, sans-serif;
+		}
+		#editor {
+			height: 400px;
+		}
+		.ql-custom {
+		  width: 18px;
+		  height: 18px;
+		}
+		.ql-divider {
+			color: #c2c2c2;
+		}
+	</style>
+	<link href="resources/quill.snow.css" rel="stylesheet">
+	<link href="resources/quill-better-table.css" rel="stylesheet">
+	<script src="resources/quill_2004.min.js"></script>
+	<script src="resources/quill-better-table.min.js"></script>
+	<script src="resources/quill-image-drop-and-paste.min.js"></script>
+	<script src="resources/quill-blot-formatter.min.js"></script>
+	<script src="resources/quill-cursors.min.js"></script>
+	<script src="https://cloud-files.3d-products.com/resources/js/jquery.min.js"></script>
+	<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script> -->
+	<script src="fancywebsocket.js"></script>
+	<script>
+		var server, editor, cursors, quill_table;
+
+		Quill.register('modules/cursors', QuillCursors);
+		Quill.register({'modules/better-table': quillBetterTable}, true);
+		Quill.register('modules/blotFormatter', QuillBlotFormatter.default);
+		var Font = Quill.import('attributors/style/font');
+		Font.whitelist = ['inconsolata', 'roboto', 'mirza', 'arial', 'eorgia'];
+		Quill.register(Font, true);
+		var Size = Quill.import('attributors/style/size');
+		Size.whitelist = ['8pt', '10pt', '11pt', '12pt', '13pt', '14pt', '15pt', '16pt', '18pt', '20pt', '24pt', '30pt', '36pt', '48pt', '60pt', '72pt', '96pt'];
+		Quill.register(Size, true);
+
+		function send(data) {
+			server.send('message', data);
+		}
+
+		function image_upload(dataUrl, type, imageData) {
+			imageData.minify({
+				maxWidth: 320,
+				maxHeight: 320,
+				quality: .7
+			}).then((miniImageData) => {
+				var blob = miniImageData.toBlob()
+				var file = miniImageData.toFile('my_cool_image.png')
+
+				console.log(`type: ${type}`)
+				console.log(`dataUrl: ${dataUrl}`)
+				console.log(`blob: ${blob}`)
+				console.log(`file: ${file}`)
+
+				// display preview image from blob url
+				var blobUrl = URL.createObjectURL(blob)
+				var preivew = document.getElementById('preview')
+				var previewImage = document.createElement('img')
+				previewImage.src = blobUrl
+				previewImage.onload = function() {
+					preview.appendChild(previewImage)
+					preview.style.display = 'block'
+				}
+
+				// display file infomation from file object
+				var info = document.getElementById('info')
+				document.getElementById('file-name').textContent = file.name
+				document.getElementById('file-size').textContent = file.size
+				document.getElementById('file-type').textContent = file.type
+				info.style.display = 'block'
+			})
+		}
+
+		jQuery(document).ready(function() {
+			editor = new Quill('#editor', {
+        theme: 'snow',
+        modules: {
+					cursors: true,
+          table: true,
+          toolbar: {
+						container: '#toolbar-container',
+						handlers: {
+							image: image_upload
+						}
+					},
+					imageDropAndPaste: {
+  					handler: image_upload
+  				},
+					blotFormatter: {
+	        },
+          'better-table': {
+            operationMenu: {
+              items: {
+                unmergeCells: {
+                  text: 'Another unmerge cells name'
+                }
+              },
+              color: {
+                colors: ['green', 'red', 'yellow', 'blue', 'white'],
+                text: 'Background Colors:'
+              }
+            }
+          },
+          keyboard: {
+            bindings: quillBetterTable.keyboardBindings
+          }
+        }
+      });
+
+			editor.on('editor-change', function(eventName, delta, olddelta, source) {
+				if (source == 'user') {
+				  if (eventName === 'text-change') {
+						send(JSON.stringify({'type': 'text-change', 'data': delta['ops']}));
+				  } else if (eventName === 'selection-change') {
+						send(JSON.stringify({'type': 'selection-change', 'data': delta}));
+				  }
+				} else if (source == 'api') {
+					if (eventName === 'selection-change') {
+						send(JSON.stringify({'type': 'selection-change', 'data': delta}));
+					}
+				}
+			});
+
+			quill_table = editor.getModule('better-table');
+
+			var ImageData = QuillImageDropAndPaste.ImageData
+			editor.getModule('toolbar').addHandler('image', function(clicked) {
+				if (clicked) {
+					var fileInput = this.container.querySelector('input.ql-image[type=file]')
+					if (fileInput == null) {
+						fileInput = document.createElement('input')
+						fileInput.setAttribute('type', 'file')
+						fileInput.setAttribute('accept', 'image/png, image/gif, image/jpeg, image/bmp, image/x-icon')
+						fileInput.classList.add('ql-image')
+						fileInput.addEventListener('change', function(e) {
+							var files = e.target.files, file
+							if (files.length > 0) {
+								file = files[0]
+								var type = file.type
+								var reader = new FileReader()
+								reader.onload = (e) => {
+									// handle the inserted image
+									var dataUrl = e.target.result
+									image_upload(dataUrl, type, new ImageData(dataUrl, type))
+									fileInput.value = ''
+								}
+								reader.readAsDataURL(file)
+							}
+						})
+					}
+					fileInput.click()
+				}
+			})
+
+			cursors = new QuillCursors(editor, {transformOnTextChange: true, selectionChangeSource: 'api'});
+
+			server = new FancyWebSocket('ws://192.168.1.22:9300');
+
+
+			// let the user know we're connected
+			server.bind("open", function() {
+				$("#status").text("connected");
+			});
+
+			// disconnection occurred
+			server.bind("close", function(data) {
+				$("#status").text("disconnected");
+			});
+
+			// process messages sent from server
+			server.bind("message", function(payload) {
+				// process new user
+				if (payload.indexOf("[CLIENT:JOINED]") === 0) {
+					var p = payload.split(" ");
+					$("#users").append("<li id='"+ p[1] + "'>" + p[2] + "</li>");
+				// user left
+				} else if (payload.indexOf("[CLIENT:LEFT]") === 0) {
+					var p = payload.split(" ");
+					$("#"+ p[1]).remove();
+				// show active users when joined
+				} else if (payload.indexOf("[CLIENTS:LIST]") === 0) {
+					var p = payload.split(" ");
+
+					if (p[1] && p[1].length !== 0) {
+						var client = p[1].split(";");
+						for (var i = 0; i < client.length; i++) {
+
+							if (client[i] && client[i].length !== 0) {
+								var c = client[i].split(",");
+								$("#users").append("<li id='"+ c[0] + "'>" + c[1] + "</li>");
+							}
+						}
+					}
+				} else {
+					data = JSON.parse(payload);
+					if (data) {
+						if (data['type'] == 'load') {
+							editor.clipboard.dangerouslyPasteHTML(0, data['data'], 'silent');
+							editor.history.clear();
+						} else if (data['type'] == 'load_diff') {
+							editor.updateContents(delta, 'silent');
+						} else if (data['type'] == 'text-change') {
+							delta = data['data'];
+							index = 0;
+							move = false;
+							for (i = 0; i < delta.length; i++) {
+								if ('delete' in delta[i]) {
+									if (delta[i]['delete'] > 1) {
+										move = true;
+									}
+									// cursors.removeCursor('abc');
+								}
+								if ('retain' in delta[i]) {
+									index = delta[i]['retain'];
+								}
+							}
+							if (move == true) {
+								cursors.moveCursor('abc', {index: index, length: 0});
+							}
+							editor.updateContents(delta, 'api');
+						} else {
+							delta = data['data'];
+							cursors.createCursor('abc', 'Ted Chou', 'red');
+							cursors.moveCursor('abc', delta);
+						}
+					}
+				}
+			});
+
+			server.connect();
+
+			jQuery('#insert_table').click(function() {
+				quill_table.insertTable(3, 3);
+			});
+		});
+
+		window.onbeforeunload = function() {
+			send(JSON.stringify({'type': 'save', 'data': editor.root.innerHTML}));
+		}
+
+	</script>
+</head>
+
+<body>
+	<div id="status-wrapper">
+		Status: <span id="status"></span>
+	</div>
+	<!-- <div id="toolbar"></div> -->
+	<div id="toolbar-container">
+		<div>
+	    <span class="ql-formats">
+				<select class="ql-header"></select>
+	      <select class="ql-font">
+	        <option selected>Sans Serif</option>
+	        <option value="inconsolata">Inconsolata</option>
+	        <option value="roboto">Roboto</option>
+	        <option value="mirza">Mirza</option>
+	        <option value="arial">Arial</option>
+					<option value="georgia">Georgia</option>
+	      </select>
+				<select class="ql-size">
+					<option value="8pt">8</option>
+					<option value="10pt">10</option>
+					<option value="12pt" selected>12</option>
+					<option value="14pt">14</option>
+					<option value="16pt">16</option>
+					<option value="18pt">18</option>
+					<option value="20pt">20</option>
+					<option value="24pt">24</option>
+					<option value="30pt">30</option>
+					<option value="36pt">36</option>
+					<option value="48pt">48</option>
+					<option value="60pt">60</option>
+					<option value="72pt">72</option>
+					<option value="96pt">96</option>
+				</select>
+				<button class="ql-bold"></button>
+	      <button class="ql-italic"></button>
+	      <button class="ql-underline"></button>
+	      <button class="ql-strike"></button>
+				<select class="ql-color"></select>
+	      <select class="ql-background"></select>
+	    </span>
+			<span class="ql-divider">|</span>
+	    <span class="ql-formats">
+	      <button class="ql-blockquote"></button>
+	      <button class="ql-code-block"></button>
+				<button class="ql-script" value="sub"></button>
+	      <button class="ql-script" value="super"></button>
+	    </span>
+		</div>
+		<div>
+	    <span class="ql-formats">
+				<select class="ql-align"></select>
+			</span>
+			<span class="ql-divider">|</span>
+			<span class="ql-formats">
+	      <button class="ql-list" value="ordered"></button>
+	      <button class="ql-list" value="bullet"></button>
+	      <button class="ql-indent" value="-1"></button>
+	      <button class="ql-indent" value="+1"></button>
+	    </span>
+			<span class="ql-divider">|</span>
+			<span class="ql-formats">
+	      <button class="ql-custom-button" id="insert_table">
+					<img src="resources/assets/table.svg" class="ql-custom" />
+				</button>
+	      <button class="ql-link"></button>
+				<button class="ql-image"></button>
+				<button class="ql-video"></button>
+	    </span>
+			<span class="ql-divider">|</span>
+	    <span class="ql-formats">
+	      <button class="ql-clean"></button>
+	    </span>
+		</div>
+  </div>
+  <div id="editor">
+	</div>
+	<h3>Users:</h3>
+	<ul id="users"></ul>
+</body>
+</html>
