@@ -4,9 +4,17 @@
 To run, open a terminal and type:
 php5 ./server.php
 
-Then visit index.html in your browser (You may need to set up a webserver to serve it).
+For opening up the WebSocket server
 
-You'll need IE10+, FF7+ or Chrome 14+ to run this example.
+
+Editing document:
+index.html
+
+Document as HTML
+data.html
+
+Export PDF
+docx.php
 
 
 ## Licensing
