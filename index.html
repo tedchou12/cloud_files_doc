@@ -159,7 +159,7 @@
           },
           keyboard: {
             bindings: quillBetterTable.keyboardBindings
-          }
+					}
         }
       });
 
@@ -288,6 +288,12 @@
 			jQuery('#insert_table').click(function() {
 				quill_table.insertTable(3, 3);
 			});
+			jQuery('#row_add').click(function() {
+				console.log(quill_table);
+			});
+			jQuery('#col_add').click(function() {
+				console.log(quill_table);
+			});
 
 			loadFonts();
 		});
@@ -295,7 +301,6 @@
 		window.onbeforeunload = function() {
 			send(JSON.stringify({'type': 'save', 'data': editor.root.innerHTML}));
 		}
-
 	</script>
 </head>
 
@@ -368,6 +373,15 @@
 	      <button class="ql-custom-button" id="insert_table">
 					<img src="resources/assets/table.svg" class="ql-custom" />
 				</button>
+				<button class="ql-custom-button" id="row_add">
+					<img src="resources/assets/row_add.png" class="ql-custom" />
+				</button>
+				<button class="ql-custom-button" id="col_add">
+					<img src="resources/assets/col_add.png" class="ql-custom" />
+				</button>
+			</span>
+			<span class="ql-divider">|</span>
+			<span class="ql-formats">
 	      <button class="ql-link"></button>
 				<button class="ql-image"></button>
 				<button class="ql-video"></button>
