@@ -1,3 +1,0 @@
-{"type":"selection-change","data":{"index":230,"length":0}}
-{"type":"text-change","data":[{"retain":230},{"delete":1}]}
-{"type":"text-change","data":[{"retain":230},{"insert":"\n"}]}
