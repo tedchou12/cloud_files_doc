@@ -17,11 +17,41 @@
 		.ql-divider {
 			color: #c2c2c2;
 		}
+		span.ql-picker-options > span[data-label="Sans Serif"] {
+			font-family: 'Sans Serif';
+		}
+		span.ql-picker-options > span[data-label="Inconsolata"] {
+			font-family: 'Inconsolata';
+		}
+		span.ql-picker-options > span[data-label="Roboto"] {
+			font-family: 'Roboto';
+		}
+		span.ql-picker-options > span[data-label="Serif"] {
+			font-family: 'Serif';
+		}
+		span.ql-picker-options > span[data-label="Arial"] {
+			font-family: 'Arial';
+		}
+		span.ql-picker-options > span[data-label="Georgia"] {
+			font-family: 'Georgia';
+		}
+		span.ql-picker-options > span[data-label="Impact"] {
+			font-family: 'Impact';
+		}
+		span.ql-picker-options > span[data-label="Monospace"] {
+			font-family: 'Monospace';
+		}
+		span.ql-picker-options > span[data-label="Courier"] {
+			font-family: 'Courier';
+		}
+		span.ql-picker-options > span[data-label="Verdana"] {
+			font-family: 'Verdana';
+		}
 	</style>
 	<link href="resources/quill.snow.css" rel="stylesheet">
 	<link href="resources/quill-better-table.css" rel="stylesheet">
-	<script src="resources/quill_2004.min.js"></script>
-	<script src="resources/quill-better-table.min.js"></script>
+	<script src="resources/quill_136.min.js"></script>
+	<script src="resources/quill-better-table-2.min.js"></script>
 	<script src="resources/quill-image-drop-and-paste.min.js"></script>
 	<script src="resources/quill-blot-formatter.min.js"></script>
 	<script src="resources/quill-cursors.min.js"></script>
@@ -32,18 +62,38 @@
 		var server, editor, cursors, quill_table;
 
 		Quill.register('modules/cursors', QuillCursors);
-		Quill.register({'modules/better-table': quillBetterTable}, true);
+		// Quill.register({'modules/better-table': quillBetterTable}, true);
 		Quill.register('modules/blotFormatter', QuillBlotFormatter.default);
 		var Font = Quill.import('attributors/style/font');
-		Font.whitelist = ['inconsolata', 'roboto', 'mirza', 'arial', 'eorgia'];
+		var Font = Quill.import('attributors/style/font');
+		Font.whitelist = ['inconsolata', 'roboto', 'serif', 'arial', 'georgia', 'impact', 'monospace', 'courier', 'verdana', 'wt011'];
 		Quill.register(Font, true);
 		var Size = Quill.import('attributors/style/size');
-		Size.whitelist = ['8pt', '10pt', '11pt', '12pt', '13pt', '14pt', '15pt', '16pt', '18pt', '20pt', '24pt', '30pt', '36pt', '48pt', '60pt', '72pt', '96pt'];
+		Size.whitelist = [];
+		for (i = 8; i < 97; i++) {
+			Size.whitelist.push(i + 'pt');
+		}
 		Quill.register(Size, true);
 
 		function send(data) {
 			server.send('message', data);
 		}
+
+		function loadFonts() {
+	    window.WebFontConfig = {
+	      google: {
+					families: ['Inconsolata::latin', 'Ubuntu+Mono::latin', 'Slabo+27px::latin', 'Roboto+Slab::latin', 'wt011']
+				}
+	    };
+	    (function() {
+	      var wf = document.createElement('script');
+	      wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+	      wf.type = 'text/javascript';
+	      wf.async = 'true';
+	      var s = document.getElementsByTagName('script')[0];
+	      s.parentNode.insertBefore(wf, s);
+	    })();
+	  }
 
 		function image_upload(dataUrl, type, imageData) {
 			imageData.minify({
@@ -51,31 +101,30 @@
 				maxHeight: 320,
 				quality: .7
 			}).then((miniImageData) => {
-				var blob = miniImageData.toBlob()
-				var file = miniImageData.toFile('my_cool_image.png')
+				var blob = miniImageData.toBlob();
+				var file = miniImageData.toFile('my_cool_image.png');
 
-				console.log(`type: ${type}`)
-				console.log(`dataUrl: ${dataUrl}`)
-				console.log(`blob: ${blob}`)
-				console.log(`file: ${file}`)
+				// console.log(`type: ${type}`);
+				// console.log(`dataUrl: ${dataUrl}`);
+				// console.log(`blob: ${blob}`);
+				// console.log(`file: ${file}`);
 
 				// display preview image from blob url
-				var blobUrl = URL.createObjectURL(blob)
-				var preivew = document.getElementById('preview')
-				var previewImage = document.createElement('img')
-				previewImage.src = blobUrl
+				var blobUrl = URL.createObjectURL(blob);
+				var preivew = document.getElementById('preview');
+				var previewImage = document.createElement('img');
+				previewImage.src = blobUrl;
 				previewImage.onload = function() {
-					preview.appendChild(previewImage)
-					preview.style.display = 'block'
+					preview.appendChild(previewImage);
+					preview.style.display = 'block';
 				}
-
 				// display file infomation from file object
-				var info = document.getElementById('info')
-				document.getElementById('file-name').textContent = file.name
-				document.getElementById('file-size').textContent = file.size
-				document.getElementById('file-type').textContent = file.type
-				info.style.display = 'block'
-			})
+				// var info = document.getElementById('info');
+				// document.getElementById('file-name').textContent = file.name;
+				// document.getElementById('file-size').textContent = file.size;
+				// document.getElementById('file-type').textContent = file.type;
+				// info.style.display = 'block';
+			});
 		}
 
 		jQuery(document).ready(function() {
@@ -83,11 +132,70 @@
         theme: 'snow',
         modules: {
 					cursors: true,
-          table: true,
+          // table: true,
           toolbar: {
 						container: '#toolbar-container',
 						handlers: {
-							image: image_upload
+							image: image_upload,
+							table: function (value) {
+		            if(value && value.includes('newtable_')) {
+		              let sizes = value.split('_');
+		              let rows = Number.parseInt(sizes[1])
+		              let columns = Number.parseInt(sizes[2])
+		              let table = Parchment.create('table');
+		              const range = this.quill.getSelection()
+		              if (!range) return
+		              const newLineIndex = getClosestNewLineIndex(this.quill.getContents(), range.index + range.length)
+		              let changeDelta = new Delta().retain(newLineIndex)
+		              changeDelta = changeDelta.insert('')
+		              for (let i = 0; i < rows; i++) {
+		                for (let j = 0; j < columns; j++) {
+		                  changeDelta = changeDelta.insert('', {
+		                    td: true
+		                  })
+		                  if (j < columns - 1) {
+		                    changeDelta = changeDelta.insert({ tdbr: false })
+		                  }
+		                }
+		                changeDelta = changeDelta.insert({ trbr: false })
+		              }
+		              this.quill.updateContents(changeDelta, Quill.sources.USER)
+		              this.quill.setSelection(newLineIndex + 1)
+		            } else {
+		              // TODO
+		            }
+		          },
+		         'table-insert-rows': function() {
+		            let td = find_td('td')
+		            if(td) {
+		              let col_count = 0
+		              td.parent.children.forEach(function (it) {
+		                if (it instanceof TableCell) {
+		                  col_count++
+		                }
+		              })
+		              let table = td.parent.parent;
+		              let new_row = td.parent.clone()
+		              for (var i = col_count - 1; i >= 0; i--) {
+		                let td = Parchment.create('td');
+		                new_row.appendChild(td);
+		                new_row.appendChild(Parchment.create('tdbr'))
+		              };
+		              new_row.appendChild(Parchment.create('trbr'))
+		              table.appendChild(new_row);
+		            }
+		          },
+		          'table-insert-columns': function() {
+		            let td = find_td('td')
+		            if(td) {
+		              let table = td.parent.parent;
+		              td.parent.parent.children.forEach(function(tr) {
+		                let td = Parchment.create('td');
+		                tr.appendChild(td);
+		                tr.appendChild(Parchment.create('tdbr'))
+		              });
+		            }
+		          }
 						}
 					},
 					imageDropAndPaste: {
@@ -95,22 +203,24 @@
   				},
 					blotFormatter: {
 	        },
-          'better-table': {
-            operationMenu: {
-              items: {
-                unmergeCells: {
-                  text: 'Another unmerge cells name'
-                }
-              },
-              color: {
-                colors: ['green', 'red', 'yellow', 'blue', 'white'],
-                text: 'Background Colors:'
-              }
-            }
-          },
           keyboard: {
-            bindings: quillBetterTable.keyboardBindings
-          }
+						bindings: {
+		          'backspaceTable': {
+		              key: 8,
+		              format: ['td'],
+		              // offset: 0,
+		              handler: function handleTableBackspace (range, context) {
+		                var formats = quill.getFormat(range.index-1, 1)
+		                if (formats.tdbr || formats.trbr) {
+		                  // prevent deletion of table break
+		                  return false
+		                }
+		                return true
+		              }
+		          }
+		        }
+            // bindings: quillBetterTable.keyboardBindings
+					}
         }
       });
 
@@ -130,15 +240,15 @@
 
 			quill_table = editor.getModule('better-table');
 
-			var ImageData = QuillImageDropAndPaste.ImageData
+			var ImageData = QuillImageDropAndPaste.ImageData;
 			editor.getModule('toolbar').addHandler('image', function(clicked) {
 				if (clicked) {
-					var fileInput = this.container.querySelector('input.ql-image[type=file]')
+					var fileInput = this.container.querySelector('input.ql-image[type=file]');
 					if (fileInput == null) {
-						fileInput = document.createElement('input')
-						fileInput.setAttribute('type', 'file')
-						fileInput.setAttribute('accept', 'image/png, image/gif, image/jpeg, image/bmp, image/x-icon')
-						fileInput.classList.add('ql-image')
+						fileInput = document.createElement('input');
+						fileInput.setAttribute('type', 'file');
+						fileInput.setAttribute('accept', 'image/png, image/gif, image/jpeg, image/bmp, image/x-icon');
+						fileInput.classList.add('ql-image');
 						fileInput.addEventListener('change', function(e) {
 							var files = e.target.files, file
 							if (files.length > 0) {
@@ -147,11 +257,11 @@
 								var reader = new FileReader()
 								reader.onload = (e) => {
 									// handle the inserted image
-									var dataUrl = e.target.result
-									image_upload(dataUrl, type, new ImageData(dataUrl, type))
-									fileInput.value = ''
+									var dataUrl = e.target.result;
+									image_upload(dataUrl, type, new ImageData(dataUrl, type));
+									fileInput.value = '';
 								}
-								reader.readAsDataURL(file)
+								reader.readAsDataURL(file);
 							}
 						})
 					}
@@ -239,12 +349,19 @@
 			jQuery('#insert_table').click(function() {
 				quill_table.insertTable(3, 3);
 			});
+			jQuery('#row_add').click(function() {
+				console.log(quill_table);
+			});
+			jQuery('#col_add').click(function() {
+				console.log(quill_table);
+			});
+
+			loadFonts();
 		});
 
 		window.onbeforeunload = function() {
 			send(JSON.stringify({'type': 'save', 'data': editor.root.innerHTML}));
 		}
-
 	</script>
 </head>
 
@@ -259,11 +376,16 @@
 				<select class="ql-header"></select>
 	      <select class="ql-font">
 	        <option selected>Sans Serif</option>
-	        <option value="inconsolata">Inconsolata</option>
-	        <option value="roboto">Roboto</option>
-	        <option value="mirza">Mirza</option>
-	        <option value="arial">Arial</option>
+					<option value="serif">Serif</option>
+					<option value="arial">Arial</option>
+					<option value="courier">Courier</option>
 					<option value="georgia">Georgia</option>
+					<option value="impact">Impact</option>
+	        <option value="inconsolata">Inconsolata</option>
+					<option value="monospace">Monospace</option>
+	        <option value="roboto">Roboto</option>
+					<option value="verdana">Verdana</option>
+					<option value="wt011">wt011</option>
 	      </select>
 				<select class="ql-size">
 					<option value="8pt">8</option>
@@ -312,6 +434,15 @@
 	      <button class="ql-custom-button" id="insert_table">
 					<img src="resources/assets/table.svg" class="ql-custom" />
 				</button>
+				<button class="ql-custom-button" id="row_add">
+					<img src="resources/assets/row_add.png" class="ql-custom" />
+				</button>
+				<button class="ql-custom-button" id="col_add">
+					<img src="resources/assets/col_add.png" class="ql-custom" />
+				</button>
+			</span>
+			<span class="ql-divider">|</span>
+			<span class="ql-formats">
 	      <button class="ql-link"></button>
 				<button class="ql-image"></button>
 				<button class="ql-video"></button>

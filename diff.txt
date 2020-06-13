@@ -1,0 +1,17 @@
+{"type":"selection-change","data":{"index":250,"length":7}}
+{"type":"selection-change","data":{"index":259,"length":0}}
+{"type":"selection-change","data":null}
+{"type":"selection-change","data":{"index":241,"length":9}}
+{"type":"selection-change","data":{"index":434,"length":0}}
+{"type":"selection-change","data":{"index":256,"length":0}}
+{"type":"selection-change","data":{"index":256,"length":1}}
+{"type":"selection-change","data":{"index":253,"length":0}}
+{"type":"selection-change","data":null}
+{"type":"selection-change","data":{"index":257,"length":6}}
+{"type":"selection-change","data":null}
+{"type":"text-change","data":[{"retain":256},{"retain":1,"attributes":{"table-cell-line":{"rowspan":"1","colspan":"1","row":"3","cell":"2","cell-bg":"yellow"},"cell-bg":"yellow"}},{"retain":6},{"retain":1,"attributes":{"table-cell-line":{"rowspan":"1","colspan":"1","row":"3","cell":"3","cell-bg":"yellow"},"cell-bg":"yellow"}}]}
+{"type":"selection-change","data":{"index":434,"length":0}}
+{"type":"selection-change","data":{"index":241,"length":22}}
+{"type":"selection-change","data":{"index":244,"length":0}}
+{"type":"selection-change","data":null}
+{"type":"selection-change","data":{"index":434,"length":0}}
